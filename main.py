@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import Resource, Api, abort, reqparse, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
+from flask import render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
 api = Api(app)
@@ -92,8 +93,39 @@ api.add_resource(TodoList, "/todos")
 with app.app_context():
     db.create_all()
     with app.app_context():
-    # Check how many rows exist
         print(f"Rows in database: {todomodel.query.count()}")
+
+@app.route('/')
+def index():
+    todos = todomodel.query.order_by(todomodel.id.desc()).all()
+    return render_template('index.html', todos=todos)
+
+@app.route('/create', methods=['POST'])
+def create():
+    title = request.form.get('title')
+    task = request.form.get('task')
+    completed = bool(request.form.get('completed'))
+    if not title or not task:
+        flash('Title and task required')
+        return redirect(url_for('index'))
+    todo = todomodel(title=title, task=task, completed=completed)
+    db.session.add(todo)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/toggle/<int:task_id>', methods=['POST'])
+def toggle(task_id):
+    t = todomodel.query.get_or_404(task_id)
+    t.completed = not t.completed
+    db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/delete/<int:task_id>', methods=['POST'])
+def delete(task_id):
+    t = todomodel.query.get_or_404(task_id)
+    db.session.delete(t)
+    db.session.commit()
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
