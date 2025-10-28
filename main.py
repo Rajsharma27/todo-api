@@ -2,8 +2,9 @@ from flask import Flask
 from flask_restful import Resource, Api, abort, reqparse, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template, request, redirect, url_for, flash
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
