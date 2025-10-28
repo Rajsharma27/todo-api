@@ -6,7 +6,12 @@ import os
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 api = Api(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+database_path = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
+if database_path.startswith('sqlite'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/database.db'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_path
+
 db = SQLAlchemy(app)
 
 from flask_cors import CORS
