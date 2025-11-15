@@ -1,5 +1,5 @@
-Flask
-Flask-RESTful
-Flask-SQLAlchemy
-Flask-CORS
-gunicorn
+Flask==2.3.3
+Flask-RESTful==0.3.10
+Flask-SQLAlchemy==3.0.5
+Flask-CORS==4.0.0
+gunicorn==21.2.0
